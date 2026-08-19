@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Stopwatch</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React
+
+    function Stopwatch() {
+      const [time, setTime] = useState(0)
+      const [running, setRunning] = useState(false)
+      const intervalRef = useRef(null)
+
+      useEffect(() => {
+        if (running) {
+          intervalRef.current = setInterval(() => {
+            setTime((prev) => prev + 10)
+          }, 10)
+        } else {
+          clearInterval(intervalRef.current)
+        }
+        return () => clearInterval(intervalRef.current)
+      }, [running])
+
+      const formatTime = (ms) => {
+        const minutes = Math.floor(ms / 60000)
+        const seconds = Math.floor((ms % 60000) / 1000)
+        const milliseconds = Math.floor((ms % 1000) / 10)
+        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(2, "0")}`
+      }
+
+      return (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          <h1>{formatTime(time)}</h1>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+            {!running ? (
+              <button onClick={() => setRunning(true)}>Start</button>
+            ) : (
+              <button onClick={() => setRunning(false)}>Stop</button>
+            )}
+            <button onClick={() => { setRunning(false); setTime(0) }}>Reset</button>
+          </div>
+        </div>
+      )
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<Stopwatch />)
+  </script>
+</body>
+</html>
